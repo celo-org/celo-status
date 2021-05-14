@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<div class="provider-container">
+    <div>
+<h1 class="titles">Celo Node Status Dashboard</h1>
+<h3 class="titles">Donut-Activated Node</h3>
+<pre><span>&gt;&nbsp;</span><span>celo/v1.3.2-stable/linux-amd64/go1.16.4</span></pre>
+        <div>
+            <!-- Place this tag where you want the button to render. -->
+            <!-- <a class="github-button" href="https://github.com/etclabscore/core-geth/fork" data-color-scheme="no-preference: dark; light: light; dark: dark;" data-icon="octicon-repo-forked" data-size="large" aria-label="Fork etclabscore/core-geth on GitHub">Fork</a> -->
+
+            <!-- Place this tag where you want the button to render. -->
+            <a class="github-button" href="https://github.com/celo-org/celo-blockchain/fork"
+               data-color-scheme="no-preference: dark; light: light; dark: dark;" data-icon="octicon-repo-forked"
+               aria-label="Fork celo-org/celo-blockchain on GitHub">Fork</a>
+
+            <!-- Place this tag where you want the button to render. -->
+            <a class="github-button" href="https://github.com/celo-org/celo-blockchain/archive/master.zip"
+               data-color-scheme="no-preference: dark; light: light; dark: dark;" data-icon="octicon-cloud-download"
+               aria-label="Download celo-org/celo-blockchain on GitHub">Download</a>
+
+            <!-- Place this tag where you want the button to render. -->
+            <a class="github-button" href="https://github.com/celo-org/celo-blockchain"
+               data-color-scheme="no-preference: dark; light: light; dark: dark;" data-icon="octicon-star"
+               aria-label="Star celo-org/celo-blockchain on GitHub">Star</a>
+
+            <!-- Place this tag where you want the button to render. -->
+            <a class="github-button" href="https://github.com/celo-org/celo-blockchain/subscription"
+               data-color-scheme="no-preference: dark; light: light; dark: dark;" data-icon="octicon-eye"
+               aria-label="Watch celo-org/celo-blockchain on GitHub">Watch</a>
+
+            <!-- Place this tag where you want the button to render. -->
+            <a class="github-button" href="https://github.com/celo-org/celo-blockchain/issues"
+               data-color-scheme="no-preference: dark; light: light; dark: dark;" data-icon="octicon-issue-opened"
+               aria-label="Issue celo-org/celo-blockchain on GitHub">Issue</a>
+
+            <!-- Place this tag where you want the button to render. -->
+            <a class="github-button" href="https://github.com/celo-org"
+               data-color-scheme="no-preference: dark; light: light; dark: dark;"
+               aria-label="Follow @celo-org on GitHub">Follow
+                @celo-org</a>
+
+        </div>
+    </div>
+    <div class="log-container">
+        <pre id="log" class="log"></pre>
+        <pre id="init-info" class="log-placeholder">
+# Please wait for Celo Blockchain's next log line.
+# It will be shown automatically and this message will disappear.
+</pre>
+    </div>
+</div>
+<br><br><br>
+
+<h3 class="titles">Non-Donut-Activated Node</h3>
+<pre><span>&gt;&nbsp;</span><span>celo/v1.2.5-stable/linux-amd64/go1.14.15</span></pre>
+<div class="log-container">
+        <pre id="log-mg" class="log"></pre>
+        <pre id="init-info-mg" class="log-placeholder">
+# Please wait for Celo-Blockchain (non-Donut Activated) next log line.
+# It will be shown automatically and this message will disappear.
+</pre>
+    </div>
+</div>
+
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<style>
+    body {
+        background-color: black;
+        color: white;
+    }
+
+    .INFO {
+        color: limegreen;
+    }
+
+    .WARN {
+        color: gold;
+    }
+
+    .ERROR {
+        color: red;
+    }
+
+    .log-placeholder {
+        color: gray;
+    }
+
+    .log {
+        overflow: hidden;
+    }
+
+    .log-container {
+        overflow: hidden;
+    }
+    .provider-container {
+        height: 17em;
+    }
+
+    .titles {
+      font-family: Verdana;
+    }
+</style>
+<script>
+
+    (function () {
+
+        var celoblockchainParams = {
+            serverAddress: '159.89.190.202',
+            serverPort: '8090',
+            div: document.getElementById('log'),
+            placeholderDiv: document.getElementById('init-info'),
+        };
+        var celoblockchainoldParams = {
+            serverAddress: '167.99.55.178',
+            serverPort: '8090',
+            div: document.getElementById('log-mg'),
+            placeholderDiv: document.getElementById('init-info-mg'),
+        };
+
+        var logProvider = function (opts) {
+
+            var serverAddress = opts.serverAddress;
+            var serverPort = opts.serverPort;
+            var hiddenInitInfo = false;
+            var logDiv = opts.div;
+            var logLineLimit = 10;
+
+            // helper function: log message to screen
+            /*
+            function log(msg){
+              document.getElementById('log').textContent += msg + '\n';
+            }
+            */
+            function log(msg) {
+                /*if (msg.indexOf("classic.service") >= 0) {
+                    return;
+                }*/
+                var lines = logDiv.innerHTML.split("\n");
+                if (msg.indexOf("-- ") != 0) {
+                    var ind = msg.indexOf("INFO") >= 0
+                        ? msg.indexOf("INFO")
+                        : msg.indexOf("WARN") >= 0
+                            ? msg.indexOf("WARN")
+                            : msg.indexOf("ERROR") >= 0
+                                ? msg.indexOf("ERROR")
+                                : 0;
+
+                    msg = msg.substring(ind);
+                    if (!hiddenInitInfo) {
+                        opts.placeholderDiv.style.display = 'none';
+                        hiddenInitInfo = true;
+                    }
+                }
+                msg = '<span class="' + msg.substring(0, 5) + '">' + msg + '</span>';
+                lines.push(msg);
+                for (; lines.length > logLineLimit;) {
+                    lines.shift();
+                }
+                logDiv.innerHTML = lines.join('\n');
+            }
+
+            // setup websocket with callbacks
+            var ws = new WebSocket('ws://' + serverAddress + ':' + serverPort + '/');
+            ws.onopen = function () {
+                log('-- CONNECT');
+            };
+            ws.onclose = function () {
+                log('-- DISCONNECT');
+            };
+            ws.onmessage = function (event) {
+                log(event.data);
+            };
+        }
+        logProvider(celoblockchainParams);
+        logProvider(celoblockchainoldParams);
+    })();
+</script>
+</body>
