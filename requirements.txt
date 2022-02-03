@@ -1,3 +1,4 @@
 Flask==0.10.1
 web3
 Jinja2
+eth-keyfile>=0.6.0 # not directly required, pinned by Snyk to avoid a vulnerability
